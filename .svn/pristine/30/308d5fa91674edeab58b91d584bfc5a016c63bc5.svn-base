@@ -1,9 +1,0 @@
-description=This plugin reads java files and generates a class model.
-email=
-image=reverseJava32.png
-license=license.html
-name=Java Source Code Reverse Engineering
-url=http://www.neosapiens.com
-actionIcon=reverseJava32.png
-actionName=Reverse Engineer Source Code
-submenu=Generate

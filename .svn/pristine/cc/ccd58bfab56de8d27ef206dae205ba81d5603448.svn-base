@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.modelsphere.jack"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.modelsphere.sms"/>
-	<classpathentry kind="lib" path="/org.modelsphere.jack/lib/antlr-3.3-complete.jar"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
