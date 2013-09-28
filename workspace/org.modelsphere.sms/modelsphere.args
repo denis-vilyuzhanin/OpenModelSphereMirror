@@ -1,0 +1,1 @@
+-Xss16m -Xmx512m -Xms64m -Dnosplash

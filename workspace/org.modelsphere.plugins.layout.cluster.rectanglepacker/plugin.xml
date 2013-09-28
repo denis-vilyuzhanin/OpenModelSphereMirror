@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin className = "@@@CLASSNAME@@@">
+	<jar>lib/plugin.jar</jar>
+
+	<type>@@@TYPE@@@</type>
+	
+	<requiredBuild>@@@REQUIREDBUILD@@@</requiredBuild>
+	
+	<name>@@@NAME@@@</name>
+	
+	<resourceBundle>locale</resourceBundle>
+	
+	<author>@@@AUTHOR@@@</author>
+	
+	<authorURL>@@@URL@@@</authorURL>
+	
+	<authorEmail>@@@EMAIL@@@</authorEmail>
+	
+	<date>@@@DATE@@@</date>
+	
+	<version>@@@VERSION@@@</version>
+	
+	<description>@@@DESCRIPTION@@@</description>
+	
+	<image>${image}</image>
+	
+	<license>${license}</license>
+</plugin>

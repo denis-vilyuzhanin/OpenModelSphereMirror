@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.6.5
+Created-By: 1.5.0_07-87 ("Apple Computer, Inc.")
+Main-Class: org.python.util.install.Installation
+Built-By: groves
+
+Name: Jython
+version: 2.2.1
+exclude-dirs: org;META-INF
+
+Name: Build-Info
+svn-build: true
+threadlocal: true
+secureclassloader: true
+servlet: true
+readline: true
+jline: true
+oracle: true
+informix: true
+mysql: true
+postgresql: true
+jndi: true
+jdbc: true
+jdbc3_0: true
+build-compiler: modern
+jdk-target-version: 1.4
+debug: off
+optimize: on
+

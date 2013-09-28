@@ -1,0 +1,437 @@
+<project default="makeAll">
+<!-- project default="env" -->
+<!-- project default="makeAll" -->
+	
+	<!--  ****************** COMMENTS ********************* 
+	  Before launching 'ant' on your local machine, you need : 
+	    -A JDK installed (version 1.4.1_02 and later)
+	       (ANT requires a JDK, a JRE is not enough)
+	    -the PATH environment variable pointing to JDK/bin directory
+	       (run env to output the value of java.home)
+  -->
+	
+  <!-- Folder properties -->
+	<property name="root"         value="c:/development" />
+	<property name="workspace"    value="${root}/workspace" />
+	<property name="distribution" value="${root}/Open ModelSphere 3.0" />
+	
+  <!-- File properties -->
+  <property name="manifestFile"    value="meta-inf/manifest.mf"/>
+  <property name="resourceFiles"   value="**/*.gif, **/*.jp*, **/*.png, **/*.properties "/>
+	
+  <path id="project.class.path">
+    <pathelement path="${classpath}"/>
+    <fileset dir="${workspace}">
+       <include name="**/*.jar"/>
+    </fileset>
+  </path>
+	
+  <!-- The main targets -->
+  <target name="help">
+    <echo message="Type : 'ant env'         to display the current environment."/>
+    <echo message="Type : 'ant help'        this target" />
+  </target>
+
+  <!-- List environment variables -->
+  <target name="env"> 
+    <echo message="Java Home Directory              : ${java.home}" />   
+  </target> 
+	
+  <target name="makeApp" depends="compileApp, archiveApp">
+    <echo message="Application Compiled and Archived"/>
+  </target>
+	
+
+	<!-- 
+	  ***  SECTION 1 : COMPILE JAVA SOURCES ***
+	--> 
+  
+	  <target name="compileApp" depends="env, init, compileJACK, compileSMS, copyTargetFiles">
+	    <echo message="JACK" />
+	  </target>
+
+	  <target name="init" >
+	    <mkdir dir="${distribution}/classes"/>
+	  	<echo message="mkdir distribution directory" />
+	  </target>
+	
+    <target name="compileJACK" depends="init">
+      <echo message="Compiling Jack.." />
+    	<replace file="${workspace}/org.modelsphere.jack/src/org/modelsphere/jack/debug/Debug.java" token="DEBUG = true" value="DEBUG = false" />
+      <javac srcdir="${workspace}/org.modelsphere.jack/src/" destdir="${distribution}/classes">
+        <classpath refid="project.class.path"/>
+      </javac>
+  <echo message="JACK compiled" />
+  </target>
+	
+  <target name="compileSMS">
+    <echo message="Compiling SMS.." />
+    <javac srcdir="${workspace}/org.modelsphere.sms/src/" destdir="${distribution}/classes">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <echo message="SMS compiled" />
+  </target>
+	
+  <target name="copyTargetFiles">
+    <echo message="Copying target system files.."/>
+    <copy todir="${distribution}/targets">
+      <fileset dir="${workspace}/org.modelsphere.sms/targets" includes="**/*" />
+    </copy>
+    <echo message="Target files copied."/>
+  </target>
+	
+	<!-- 
+	  ***  SECTION 2 : ARCHIVE APPLICATION ***
+	-->
+
+	<target name="archiveApp" depends="copyLibraries, zipResources, jarApp, copyFiles"> 
+	</target>
+
+  <target name="copyLibraries">
+    <echo message="Copying jakarta jar.."/>
+    <copy todir="${distribution}/lib/jakarta-regexp-1.5">
+      <fileset dir="${workspace}/org.modelsphere.sms/lib/jakarta-regexp-1.5" includes="jakarta-regexp-1.5.jar" />
+    	<fileset dir="${workspace}/org.modelsphere.sms/lib/jakarta-regexp-1.5" includes="NOTICE" />
+    	<fileset dir="${workspace}/org.modelsphere.sms/lib/jakarta-regexp-1.5" includes="LICENSE" />
+    </copy>
+    <echo message="jakarta jar copied."/>
+  	
+    <echo message="Copying jython jar.."/>
+    <copy todir="${distribution}/lib/jython-2.2.1">
+      <fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="jython.jar" />
+    	<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="LICENSE_Apache" />
+      <fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="LICENSE" />
+      <fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="LICENSE_CPython" />
+    	<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="README" />
+    </copy>
+    <echo message="jython jar copied."/>
+  </target>
+
+	<target name="zipResources">
+    <copy todir="${distribution}/resources/">
+      <fileset dir="${workspace}/org.modelsphere.sms/src/" includes="**/*.htm*" />
+    </copy>
+		 <zip destfile="${distribution}/resources.zip">
+		      <fileset dir="${workspace}/org.modelsphere.jack/src" includes="${resourceFiles}"/>
+		      <fileset dir="${workspace}/org.modelsphere.sms/src"  includes="${resourceFiles}"/>
+		 </zip>
+		 <echo message="Resources.zip created."/>
+	</target>
+
+	<target name="jarApp">
+		<jar jarfile="${distribution}/modelsphere.jar" manifest="${workspace}/org.modelsphere.sms/${manifestFile}">
+		  <fileset dir="${distribution}/classes" includes="org/**"/>
+		</jar>
+		<echo message="modelsphere.jar created."/>
+	</target>
+	
+	<target name="copyFiles">
+		<copy file="${workspace}/org.modelsphere.distribution/modelsphere.bat"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/modelsphere.args"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/OpenModelSphere.ico"  todir="${distribution}" />		
+		<copy file="${workspace}/README.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/GETSTARTED.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/DÉMARREZ.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/LICENSE.TXT"  todir="${distribution}" />			
+		<replace file="${distribution}/modelsphere.bat"  token="{JVM}" value="${java.home}/bin/java.exe"/>
+		<replace file="${distribution}/modelsphere.args" token="{WS}" value="${distribution}"/>
+		<echo message="Modelsphere.bat and modelsphere.args copied" />
+	</target>
+	
+	<!-- 
+	  ***  SECTION 3 : COMPILE AND ARCHIVE PLUG-INS ***
+	-->
+
+	<target name="makeAll" 
+		depends="makeApp, makePlugins, copyTplFiles, copyingDocAndExamples, make_doc">
+	</target>
+	
+	<target name="makePlugins" depends="compileApp">
+		<property name="plugins" value="${distribution}/plugins" />
+		<echo message="Compiling plug-ins.." />
+		<mkdir dir="${plugins}"/>
+		<copy todir="${plugins}">
+	    <fileset dir="${workspace}/org.modelsphere.plugins" includes="**/*"/>
+	  </copy>  
+		
+		<!-- Compile and archive repository functions -->
+		<property name="plugin01" value="repository_functions" />
+		<mkdir dir="${plugins}/${plugin01}/bin"/>
+		<javac srcdir="${plugins}/${plugin01}/src" classpath="${distribution}/classes" 
+			destdir="${plugins}/${plugin01}/bin">
+		  <classpath refid="project.class.path"/>
+		</javac>
+    <jar jarfile="${plugins}/${plugin01}.jar"
+         basedir="${plugins}/${plugin01}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin01}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin01}/src"/>
+		
+    <!-- Compile and archive diagram statistics -->
+    <property name="plugin02" value="diagram_statistics" />
+    <mkdir dir="${plugins}/${plugin02}/bin"/>
+    <javac srcdir="${plugins}/${plugin02}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin02}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin02}.jar"
+         basedir="${plugins}/${plugin02}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin02}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin02}/src"/>
+
+    <!-- Compile and archive forward_ansi -->
+    <property name="plugin03" value="forward_ansi" />
+    <mkdir dir="${plugins}/${plugin03}/bin"/>
+    <javac srcdir="${plugins}/${plugin03}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin03}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin03}.jar"
+         basedir="${plugins}/${plugin03}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin03}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin03}/src"/>
+		
+		<!-- Compile and archive forward_ansi -->
+    <property name="plugin04" value="forward_ansi_toolkit" />
+    <mkdir dir="${plugins}/${plugin04}/bin"/>
+    <javac srcdir="${plugins}/${plugin04}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin04}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin04}.jar"
+         basedir="${plugins}/${plugin04}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin04}/${manifestFile}"
+		/>
+		<delete dir="${plugins}/${plugin04}/src"/>
+		
+		<!-- Compile and archive genmeta -->
+    <property name="plugin05" value="genmeta" />
+    <mkdir dir="${plugins}/${plugin05}/bin"/>
+    <javac srcdir="${plugins}/${plugin05}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin05}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin05}.jar"
+         basedir="${plugins}/${plugin05}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin05}/${manifestFile}"
+		/>
+		<delete dir="${plugins}/${plugin05}/src"/>
+		
+    <!-- Compile and archive get_domain_values -->
+    <property name="plugin06" value="get_domain_values" />
+    <mkdir dir="${plugins}/${plugin06}/bin"/>
+    <javac srcdir="${plugins}/${plugin06}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin06}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin06}.jar"
+         basedir="${plugins}/${plugin06}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin06}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin06}/src"/>
+
+    <!-- Compile and archive process_tree -->
+    <property name="plugin07" value="process_tree" />
+    <mkdir dir="${plugins}/${plugin07}/bin"/>
+    <javac srcdir="${plugins}/${plugin07}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin07}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin07}.jar"
+         basedir="${plugins}/${plugin07}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin07}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin07}/src"/>
+		
+    <!-- Compile and archive propagate_domain_values -->
+    <property name="plugin08" value="propagate_domain_values" />
+    <mkdir dir="${plugins}/${plugin08}/bin"/>
+    <javac srcdir="${plugins}/${plugin08}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin08}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin08}.jar"
+         basedir="${plugins}/${plugin08}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin08}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin08}/src"/>
+
+    <!-- Compile and archive report -->
+    <property name="plugin09" value="report" />
+    <mkdir dir="${plugins}/${plugin09}/bin"/>
+    <javac srcdir="${plugins}/${plugin09}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin09}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin09}.jar"
+         basedir="${plugins}/${plugin09}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin09}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin09}/src"/>
+
+    <!-- Compile and archive sql_shell_activator -->
+    <property name="plugin10" value="sql_shell_activator" />
+    <mkdir dir="${plugins}/${plugin10}/bin"/>
+    <javac srcdir="${plugins}/${plugin10}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin10}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin10}.jar"
+         basedir="${plugins}/${plugin10}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin10}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin10}/src"/>
+
+    <!-- Compile and archive validation_generic -->
+    <property name="plugin11" value="validation_generic" />
+    <mkdir dir="${plugins}/${plugin11}/bin"/>
+    <javac srcdir="${plugins}/${plugin11}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin11}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin11}.jar"
+         basedir="${plugins}/${plugin11}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin11}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin11}/src"/>
+		
+    <!-- Compile and archive verify_integrity -->
+    <property name="plugin12" value="verify_integrity" />
+    <mkdir dir="${plugins}/${plugin12}/bin"/>
+    <javac srcdir="${plugins}/${plugin12}/src" classpath="${distribution}/classes" 
+      destdir="${plugins}/${plugin12}/bin">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <jar jarfile="${plugins}/${plugin12}.jar"
+         basedir="${plugins}/${plugin12}/bin/"
+         includes="org/**/*"
+         manifest="${plugins}/${plugin12}/${manifestFile}"
+    />
+		<delete dir="${plugins}/${plugin12}/src"/>
+				
+	  <echo message="Plug-ins compiled." />
+	</target>
+	
+	<!-- Copy .tpl files -->
+  <target name="copyTplFiles"> 
+    <copy file="${workspace}/org.modelsphere.plugins/forward_ansi/src/org/modelsphere/sms/plugins/ansi/forward/generateddl.tpl"  todir="${distribution}/targets/" />
+  </target>
+		
+	<!-- 
+	   ***  SECTION 4 : COPY DOC AND EXAMPLES ***
+	-->
+	
+	<target name="copyingDocAndExamples" depends="copyingDrivers, copyingDoc, copyingExamples"/>
+
+  <!-- Copy drivers -->
+	<target name="copyingDrivers">
+    <copy todir="${distribution}/drivers">
+      <fileset dir="${workspace}/org.modelsphere.sms/drivers" includes="**/*" excludes="*.scc"/>
+    </copy>
+	</target>
+	
+  <!-- Copy English and French documentation -->
+	<target name="copyingDoc">
+    <copy todir="${distribution}/doc">
+    	<fileset dir="${workspace}/org.modelsphere.guide/help_sms" includes="**/*" excludes="*.scc"/>
+    </copy>
+	</target>
+	
+	<!-- Copy examples -->
+	<target name="copyingExamples">
+		<echo message="Copying examples.." />
+		<mkdir dir="${distribution}/examples"/>
+		<copy todir="${distribution}/examples">
+		  <fileset dir="${workspace}/org.modelsphere.distribution/examples" includes="**/*" />
+		</copy>
+		
+    <echo message="Examples copied." />
+	</target>
+	
+  <!-- 
+	   ***  SECTION 5 :  GENERATE JAVADOC ***
+	-->
+	
+	<target name="make_doc">
+		<property name="APIDir" value="${distribution}/doc/api" />
+	  <javadoc destDir="${APIDir}"
+	           author="true"
+	           version="true"
+	           use="true"
+	           breakiterator="true"
+	           windowtitle="ModelSphere API Javadoc">
+	  	
+	  <!-- BASE DB -->
+    <fileset dir="${workspace}/org.modelsphere.jack/src" defaultexcludes="yes">
+      <include name="org/modelsphere/jack/baseDb/db/Db*.java" />
+    </fileset>
+
+    <fileset dir="${workspace}/org.modelsphere.jack/src" defaultexcludes="yes">
+      <include name="org/modelsphere/jack/baseDb/meta/*.java" />
+    </fileset>
+	  	
+    <!-- GENERIC DB -->
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/db/Db*.java" />
+    </fileset>
+
+    <!-- BE -->
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/be/db/Db*.java" />
+    </fileset>
+
+    <!-- OR -->
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/or/db/Db*.java" />
+    </fileset>
+
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/or/ibm/db/Db*.java" />
+    </fileset>
+
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/or/informix/db/Db*.java" />
+    </fileset>
+
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/or/oracle/db/Db*.java" />
+    </fileset>
+
+    <!-- OO -->
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/oo/db/Db*.java" />
+    </fileset>
+
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/oo/java/db/Db*.java" />
+    </fileset>
+
+    <!-- templates -->
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/templates/GenericMapping.java" />
+    </fileset>
+    
+    <fileset dir="${workspace}/org.modelsphere.sms/src" defaultexcludes="yes">
+      <include name="org/modelsphere/sms/plugins/generic/repository/*.java" />
+    </fileset>
+
+	  <bottom><![CDATA[<i>Open ModelSphere 2007. All Rights Reserved.</i>]]></bottom>
+	  </javadoc>
+	</target>
+	    	
+
+
+</project>

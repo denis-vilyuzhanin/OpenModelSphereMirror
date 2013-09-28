@@ -1,0 +1,113 @@
+<project name="Build Modelsphere Plugin" default="clean" basedir=".">
+	<!-- set global properties for this build -->
+
+	<!-- projectID is used to generate the name for the distribution file-->
+	<property name="projectID" value="org_modelsphere_plugins_layout_cluster_rectanglepacker_RectanglePackerAlgorithm" />
+
+	<!-- Plugin properties -->
+	<property name="className" 
+		value="org.modelsphere.plugins.layout.cluster.rectanglepacker.RectanglePackerPlugin" />
+	<property name="type" value="org.modelsphere.jack.srtool.features.layout.LayoutPlugin" />
+	<property name="requiredBuild" value="950" />
+	<property name="name" value="Layout Algorithm - Rectangle Packer" />
+	<property name="version" value="0.1" />
+	<property name="author" value="modelsphere.org" />
+	<property name="url" value="http://www.modelsphere.org" />
+	<property name="email" value="" />
+	<!-- Plugin localized description -->
+	<property name="description" value="${description}" />
+
+	<!-- Compilation properties -->
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+
+	<target name="init">
+		<!-- Create the time stamps -->
+		<tstamp>
+			<format property="pluginTstamp" pattern="d-MMMM-yyyy" />
+			<format property="zipTstamp" pattern="yyyyMMdd" />
+		</tstamp>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+		<!-- Create the temporary distribution directory -->
+		<mkdir dir="${dist}/temp" />
+	</target>
+
+	<target name="compile" depends="init" 
+		description="compile the source ">
+		<!-- Compile the java code from ${src} into ${build}.  Use the commented 
+			line instead for using the modelsphere distribution jar-->
+		<!-- javac srcdir="${src}" destdir="${build}" debug="off" debuglevel="lines,vars,source"  
+			classpath="lib/modelsphere.jar" / -->
+		<javac srcdir="${src}" destdir="${build}" debug="on" debuglevel="lines,vars,source" 
+			classpath="../org.modelsphere.jack/bin;../org.modelsphere.sms/bin" />
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<include name="**/*.properties" />
+				<include name="**/*.jpg" />
+				<include name="**/*.jpeg" />
+				<include name="**/*.gif" />
+				<include name="**/*.png" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="dist" depends="compile" 
+		description="generate the distribution">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}/temp/lib" />
+
+		<!-- Put everything in ${build} into the plugin.jar file -->
+		<jar jarfile="${dist}/temp/lib/plugin.jar" basedir="${build}" />
+	</target>
+
+	<target name="includeresources" depends="dist" 
+			description="include other resources">
+		<copy file="plugin.png" todir="${dist}/temp" />
+		<copy file="plugin.xml" todir="${dist}/temp" />
+		<copy todir="${dist}/temp">
+			<fileset dir=".">
+				<include name="license*.html" />
+			</fileset>
+		</copy>
+		<copy todir="${dist}/temp">
+			<fileset dir=".">
+				<include name="locale*.properties" />
+			</fileset>
+		</copy>
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@CLASSNAME@@@" value="${className}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@TYPE@@@" value="${type}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@REQUIREDBUILD@@@" value="${requiredBuild}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@NAME@@@" value="${name}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@VERSION@@@" value="${version}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@AUTHOR@@@" value="${author}" />
+		<replace file="${dist}/temp/plugin.xml" 
+				token="@@@URL@@@" value="${url}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@EMAIL@@@" value="${email}" />
+		<replace file="${dist}/temp/plugin.xml" 
+			token="@@@DATE@@@" value="${pluginTstamp}" />
+		<replace file="${dist}/temp/plugin.xml" 
+				token="@@@DESCRIPTION@@@" value="${description}" />
+	</target>
+
+	<target name="zip" depends="includeresources" 
+		description="create the distribution archive">
+		<zip destfile="${dist}/${projectID}-${zipTstamp}.zip" 
+			basedir="${dist}/temp" />
+	</target>
+
+	<target name="clean" depends="zip" 
+		description="clean up temporary directories">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}" />
+		<delete dir="${dist}/temp" />
+	</target>
+</project>

@@ -1,0 +1,22 @@
+package org.modelsphere.plugins.layout.cluster.rectanglepacker;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.modelsphere.jack.srtool.features.layout.LayoutAlgorithm;
+import org.modelsphere.jack.srtool.features.layout.LayoutPlugin;
+
+public class RectanglePackerPlugin extends LayoutPlugin {
+    private RectanglePackerAlgorithm rectanglePackerAlgorithm;
+
+    @Override
+    public List<LayoutAlgorithm> getLayoutAlgorithms() {
+        if (rectanglePackerAlgorithm == null)
+            rectanglePackerAlgorithm = new RectanglePackerAlgorithm();
+
+        ArrayList<LayoutAlgorithm> algorithms = new ArrayList<LayoutAlgorithm>();
+        algorithms.add(rectanglePackerAlgorithm);
+        return algorithms;
+    }
+
+}

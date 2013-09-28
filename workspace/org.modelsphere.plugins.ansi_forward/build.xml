@@ -1,0 +1,14 @@
+<project name="Build Modelsphere Plugin" default="dist">
+
+    <property name="projectName" value="org.modelsphere.plugins.ansi_forward" />
+    
+    <target name="dist">
+        <jar destfile="../${projectName}.jar"
+             basedir="bin"
+             level="0"
+        />
+        <move file="../${projectName}.jar" todir="../org.modelsphere.sms/plugins" />
+        
+    </target>
+  
+</project>

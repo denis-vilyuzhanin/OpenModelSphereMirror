@@ -1,0 +1,221 @@
+<project default="makeAll">
+	<!-- project default="env" -->
+	<!-- project default="makeAll" -->
+
+	<!--  ****************** COMMENTS ********************* 
+	  Before launching 'ant' on your local machine, you need : 
+	    -A JDK installed (version 1.6.0_11 and later)
+	       (ANT requires a JDK, a JRE is not enough)
+	    -the PATH environment variable pointing to JDK/bin directory
+	       (run env to output the value of java.home)
+  -->
+
+	<!-- Folder properties -->
+  <property name="root"         value="C:\DeveloppementJavaForge\trunk" />
+  <property name="workspace"    value="${root}/workspace" />
+  <property name="distribution" value="${root}/Open ModelSphere 3.2 Beta build 964" />
+
+	<!-- File properties -->
+	<property name="manifestFile"    value="meta-inf/manifest.mf"/>
+	<property name="resourceFiles"   value="**/*.gif, **/*.jp*, **/*.txt, **/*.dic, **/*.png, **/*.properties "/>
+
+	<path id="project.class.path">
+		<pathelement path="${classpath}"/>
+		<fileset dir="${workspace}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- The main targets -->
+	<target name="help">
+		<echo message="Type : 'ant env'         to display the current environment."/>
+		<echo message="Type : 'ant help'        this target" />
+	</target>
+
+	<!-- List environment variables -->
+	<target name="env">
+		<echo message="Java Home Directory              : ${java.home}" />
+	</target>
+
+	<target name="makeApp" depends="compileApp, archiveApp">
+		<echo message="Application Compiled and Archived"/>
+	</target>
+
+
+	<!-- 
+	  ***  SECTION 1 : COMPILE JAVA SOURCES ***
+	-->
+
+	<target name="compileApp" depends="env, init, compileJACK, compileSMS, copyTargetFiles">
+		<echo message="JACK" />
+	</target>
+
+	<target name="init" >
+		<mkdir dir="${distribution}/classes"/>
+		<echo message="mkdir distribution directory" />
+	</target>
+
+	<target name="compileJACK" depends="init">
+		<echo message="Compiling Jack.." />
+		<replace file="${workspace}/org.modelsphere.jack/src/org/modelsphere/jack/debug/Debug.java" token="DEBUG = true" value="DEBUG = false" />
+		<javac srcdir="${workspace}/org.modelsphere.jack/src/" destdir="${distribution}/classes" source="1.6" target="1.6" encoding="Cp1252">
+			<classpath refid="project.class.path"/>
+		</javac>
+		<echo message="JACK compiled" />
+	</target>
+
+	<target name="compileSMS">
+		<echo message="Compiling SMS.." />
+		<javac srcdir="${workspace}/org.modelsphere.sms/src/" destdir="${distribution}/classes" source="1.6" target="1.6" encoding="Cp1252">
+			<classpath refid="project.class.path"/>
+		</javac>
+		<echo message="SMS compiled" />
+	</target>
+
+	<target name="copyTargetFiles">
+		<echo message="Copying target system files.."/>
+		<copy todir="${distribution}/targets">
+			<fileset dir="${workspace}/org.modelsphere.sms/targets" includes="**/*" />
+		</copy>
+		<echo message="Target files copied."/>
+	</target>
+
+	<!-- 
+	  ***  SECTION 2 : ARCHIVE APPLICATION ***
+	-->
+
+	<target name="archiveApp" depends="copyLibraries, zipResources, jarApp, copyFiles">
+	</target>
+
+	<target name="copyLibraries">
+
+		<echo message="Copying lablib-checkboxtree jar.."/>
+		<copy todir="${distribution}/lib">
+			<fileset dir="${workspace}/org.modelsphere.sms/lib" includes="lablib-checkboxtree-3.0.2.jar" />
+		</copy>
+		<echo message="lablib-checkboxtree jar copied."/>
+		
+		<echo message="Copying antlr-3.3-complete jar.."/>
+		<copy todir="${distribution}/lib">
+			<fileset dir="${workspace}/org.modelsphere.jack/lib" includes="antlr-3.3-complete.jar" />
+		</copy>
+		<echo message="antlr-3.3-complete jar copied."/>
+		
+
+		<echo message="Copying jakarta jar.."/>
+		<copy todir="${distribution}/lib/jakarta-regexp-1.5">
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jakarta-regexp-1.5" includes="jakarta-regexp-1.5.jar" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jakarta-regexp-1.5" includes="NOTICE" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jakarta-regexp-1.5" includes="LICENSE" />
+		</copy>
+		<echo message="jakarta jar copied."/>
+
+		<echo message="Copying velocity jar.."/>
+		<copy todir="${distribution}/lib/velocity-1.6.1">
+			<fileset dir="${workspace}/org.modelsphere.jack/lib/velocity-1.6.1" includes="velocity-1.6.1.jar" />
+			<!--<fileset dir="${workspace}/org.modelsphere.sms/lib/velocity-1.6.1" includes="NOTICE" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/velocity-1.6.1" includes="LICENSE" />-->
+		</copy>
+		<echo message="velocity jar copied."/>
+
+		<echo message="commons-... .jar.."/>
+		<copy todir="${distribution}/lib/velocity-1.6.1/lib">
+			<fileset dir="${workspace}/org.modelsphere.jack/lib/velocity-1.6.1/lib" includes="commons-collections-3.2.1.jar" />
+			<fileset dir="${workspace}/org.modelsphere.jack/lib/velocity-1.6.1/lib" includes="commons-lang-2.4.jar" />
+		</copy>
+		<echo message="commons-... .jar.. copied."/>
+
+
+		<echo message="Copying jgrapht-all.jar.."/>
+		<copy todir="${distribution}/lib/jgrapht-all">
+			<fileset dir="${workspace}/org.modelsphere.jack/lib" includes="jgrapht-all.jar" />
+		</copy>
+		<echo message="jgrapht-all.jar copied."/>
+		
+    <echo message="Copying Jazzy-Core jar.."/>
+    <copy todir="${distribution}/lib/jazzy-core">
+      <fileset dir="${workspace}/org.modelsphere.jack/lib" includes="jazzy-core.jar" />
+    </copy>
+    <echo message="Jazzy-Core jar copied."/>
+
+		<echo message="Copying jython jar.."/>
+		<copy todir="${distribution}/lib/jython-2.2.1">
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="jython.jar" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="LICENSE_Apache" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="LICENSE" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="LICENSE_CPython" />
+			<fileset dir="${workspace}/org.modelsphere.sms/lib/jython-2.2.1" includes="README" />
+		</copy>
+		<echo message="jython jar copied."/>
+	</target>
+
+	<target name="zipResources">
+		<copy todir="${distribution}/resources/">
+			<fileset dir="${workspace}/org.modelsphere.sms/src/" includes="**/*.txt*" />
+		</copy>
+		<zip destfile="${distribution}/resources.zip">
+			<fileset dir="${workspace}/org.modelsphere.jack/src" includes="${resourceFiles}"/>
+			<fileset dir="${workspace}/org.modelsphere.sms/src"  includes="${resourceFiles}"/>
+		</zip>
+		<echo message="Resources.zip created."/>
+	</target>
+
+	<target name="jarApp">
+		<jar jarfile="${distribution}/modelsphere.jar" manifest="${workspace}/org.modelsphere.sms/${manifestFile}">
+			<fileset dir="${distribution}/classes" includes="org/**"/>
+		</jar>
+		<echo message="modelsphere.jar created."/>
+	</target>
+
+	<target name="copyFiles">
+		<copy file="${workspace}/org.modelsphere.distribution/modelsphere.bat"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/modelsphere.args"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/OpenModelSphere.ico"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/textesOpenMS/README.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/textesOpenMS/GETSTARTED.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/textesOpenMS/DÉMARREZ.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/textesOpenMS/LICENSE.TXT"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/textesOpenMS/locale_en.properties"  todir="${distribution}" />
+		<copy file="${workspace}/org.modelsphere.distribution/textesOpenMS/locale_fr.properties"  todir="${distribution}" />
+		<replace file="${distribution}/modelsphere.bat"  token="{JVM}" value="${java.home}/bin/java.exe"/>
+		<replace file="${distribution}/modelsphere.args" token="{WS}" value="${distribution}"/>
+		<echo message="Modelsphere.bat and modelsphere.args copied" />
+	</target>
+
+  <!-- 
+     ***  SECTION 3 : COPY DOC AND EXAMPLES ***
+  -->
+	 <target name="makeAll"  
+	    depends="makeApp, deleteClassesFolder, copyingDoc, copyingExamples">
+    <property name="plugins" value="${distribution}/plugins" />
+    <mkdir dir="${plugins}"/>
+	 	<property name="drivers" value="${distribution}/drivers" />
+	  <mkdir dir="${drivers}"/>
+	  <property name="doc" value="${distribution}/doc" />
+	    <mkdir dir="${doc}"/>
+  </target>
+	
+  	<!-- Delete Classes folder -->
+  	<target name="deleteClassesFolder">
+  		<delete dir="${distribution}/classes"/>
+	</target>
+
+	<!-- Copy English and French documentation -->
+	<target name="copyingDoc">
+		<copy todir="${distribution}/doc">
+			<fileset dir="${workspace}/org.modelsphere.guide/help_sms" includes="**/*" excludes="*.scc"/>
+		</copy>
+	</target>
+	
+	<!-- Copy examples -->
+	<target name="copyingExamples">
+		<echo message="Copying examples.." />
+		<mkdir dir="${distribution}/examples"/>
+		<copy todir="${distribution}/examples">
+		  <fileset dir="${workspace}/org.modelsphere.distribution/examples" includes="**/*" />
+		</copy>
+		
+    <echo message="Examples copied." />
+	</target>
+
+</project>

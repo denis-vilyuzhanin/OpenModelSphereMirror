@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Created-By: Ant 1.4
+Implementation-Title: Open ModelSphere
+Implementation-Version: 908
+Implementation-Vendor: Open ModelSphere
+Main-Class: org/modelsphere/sms/Application
+
